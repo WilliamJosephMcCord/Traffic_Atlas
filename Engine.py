@@ -11,22 +11,12 @@ from geopy.exc import GeocoderServiceError, GeocoderTimedOut
 from geopy.geocoders import GoogleV3
 from pyproj import Transformer
 
-
-# BASE DIRECTORY AND ENVIRONMENT VARIABLES
-# AADTC Map/Front_Ends
 BASE_DIR = Path(__file__).resolve().parent
 
-# Main project folder:
-# AADTC Map
 PROJECT_ROOT = BASE_DIR.parent
 
-# Data folder:
-# AADTC Map/AATDC_Data_File_Paths
 DATA_DIRECTORY = PROJECT_ROOT / "AATDC_Data_File_Paths"
 
-
-# GOOGLE API KEYS
-# AADTC Map/Front_Ends/.env
 load_dotenv(BASE_DIR / ".env")
 
 GOOGLE_GEOCODING_API_KEY = os.getenv(
@@ -49,14 +39,10 @@ if not GOOGLE_MAPS_BROWSER_KEY:
         "Add it to the local .env file or Streamlit Secrets."
     )
 
-
-# FILE PATHS
 EXCEL_FILE = BASE_DIR / "AADT_Excel.xlsx"
 
 OUTPUT_MAP = BASE_DIR / "traffic_map.html"
 
-
-# STATE CONFIGURATIONS
 STATE_CONFIGS = {
     "FL": {
         "type": "shapefile",
@@ -251,8 +237,6 @@ STATE_CONFIGS = {
     }
 }
 
-
-# GOOGLE GEOCODER
 geolocator = GoogleV3(
     api_key=GOOGLE_GEOCODING_API_KEY,
     timeout=10
@@ -277,8 +261,6 @@ def geocode_address(address):
             f"Google geocoding failed: {error}"
         ) from error
 
-
-# CLEANING FUNCTIONS
 def clean_for_geojson(gdf):
     """
     Convert values that cannot be serialized to valid GeoJSON.
@@ -329,8 +311,6 @@ def json_safe_number(value):
 
     return float(value)
 
-
-# AADT FIELD FINDER
 def find_aadt_field(data):
     """
     Find the AADT field even when different states use
@@ -365,8 +345,6 @@ def find_aadt_field(data):
 
     return None
 
-
-# DISTANCE FUNCTION
 def haversine(lat1, lon1, lat2, lon2):
     """
     Calculate straight-line distance in miles between
@@ -394,8 +372,6 @@ def haversine(lat1, lon1, lat2, lon2):
 
     return earth_radius_miles * c
 
-
-# GOOGLE MAP HTML GENERATOR
 def generate_google_map_html(
     search_lat,
     search_lon,
@@ -811,8 +787,6 @@ def generate_google_map_html(
 
     return str(OUTPUT_MAP)
 
-
-# SHAPEFILE PROCESSING
 def process_shapefile(
     config,
     search_lat,
@@ -833,7 +807,6 @@ def process_shapefile(
             f"The shapefile has no CRS: {shapefile_path}"
         )
 
-    # Use a projected CRS to calculate representative points.
     projected_gdf = gdf.to_crs("EPSG:5070")
     representative_points = (
         projected_gdf.geometry.representative_point()
@@ -880,8 +853,6 @@ def process_shapefile(
 
     return traffic_geojson, aadt_field
 
-
-# EXCEL PROCESSING
 def process_excel(
     config,
     search_lat,
@@ -1014,8 +985,6 @@ def process_excel(
 
     return traffic_points
 
-
-# MAIN FUNCTION
 def create_map(address, state, num_points):
     """
     Geocode the address, find nearby traffic stations,
